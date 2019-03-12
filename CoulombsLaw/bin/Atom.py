@@ -1,3 +1,6 @@
+"""
+This file was written by Jason Lawrence to be used for Professor Minh's Research Group
+"""
 class Atom:
     def __init__(self, field, num, name, res, id, resNum, x, y, z, charge, radius):
         self.Field         = field   #0
