@@ -1,3 +1,9 @@
+"""
+This file holds utility functions to be used. This entails opening, parsing, and loading files into the program.
+It builds all of the Atoms in the file and provides a list of general atoms and a list of ligands
+At the end of the program it takes the results and writes it to a file.
+This file was written by Jason Lawrence to be used for Professor Minh's Research Group
+"""
 import Atom
 
 def init(dir, fileName):
@@ -13,23 +19,39 @@ def Constructor(file):
     for line in file.readlines():
         print(line)
         atomInfo = parser(line)
-        if len(atomInfo) == 10: #True if there is no Chain ID. Chain ID will be set to an empty string ""
-            atomInfo.insert(4, "")
-        atom = buildAtom(atomInfo)
+        Atom = buildAtom(atomInfo)
 
-        if line[2] == "LIG":
-            Ligands.append(atom)
+        if Atom.Residue == "LIG":
+            Ligands.append(Atom)
         else:
-            Atoms.append(atom)
+            Atoms.append(Atom)
 
     return Atoms, Ligands
 
 def parser(line):
     parsed = " ".join(line.split())
-    print(parsed)
     parsedLine = parsed.split(" ")
+    if parsedLine[3] == "LIG": #sets the Radius to be None
+        parsedLine.append(0)
+    #if parsedLine[4] == "X":
+    #    parsedLine.pop(4)
+    try:
+        float(parsedLine[4]) #fails if there is no Chain ID. Chain ID will be set to None
+        parsedLine.insert(4, None)
+    except:
+        print("")
+    while len(parsedLine) < 11:
+        parsedLine.append(0)
+
     print(parsedLine)
     return parsedLine
 
 def buildAtom(atomInfo):
-    return Atom.Atom(atomInfo[0], int(atomInfo[1]), atomInfo[2], atomInfo[3], atomInfo[4], int(atomInfo[5]), float(atomInfo[6]), float(atomInfo[7]), float(atomInfo[8]), float(atomInfo[9]), float(atomInfo[10])) 
+    return Atom.Atom(atomInfo[0], int(atomInfo[1]), atomInfo[2], atomInfo[3], atomInfo[4],  atomInfo[5], float(atomInfo[6]), float(atomInfo[7]), float(atomInfo[8]), float(atomInfo[9]), float(atomInfo[10]))
+
+def outputGeneration(dir, file, results):
+    filePath = dir + "\\Output" + file
+    outputFile = open(filePath, 'w+')
+    for charge, distance in results:
+        outputFile.write(str(charge) + ", " + str(distance) + "\n")
+    outputFile.close()
