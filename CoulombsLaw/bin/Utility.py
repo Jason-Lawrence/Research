@@ -20,12 +20,10 @@ def Constructor(file):
         print(line)
         atomInfo = parser(line)
         Atom = buildAtom(atomInfo)
-
         if Atom.Residue == "LIG":
             Ligands.append(Atom)
         else:
             Atoms.append(Atom)
-
     return Atoms, Ligands
 
 def parser(line):
@@ -33,10 +31,8 @@ def parser(line):
     parsedLine = parsed.split(" ")
     if parsedLine[3] == "LIG": #sets the Radius to be None
         parsedLine.append(0)
-    #if parsedLine[4] == "X":
-    #    parsedLine.pop(4)
     try:
-        float(parsedLine[4]) #fails if there is no Chain ID. Chain ID will be set to None
+        float(parsedLine[4]) # Works if there is no Chain ID. Chain ID will be set to None
         parsedLine.insert(4, None)
     except:
         print("")
@@ -52,6 +48,6 @@ def buildAtom(atomInfo):
 def outputGeneration(dir, file, results):
     filePath = dir + "\\Output" + file
     outputFile = open(filePath, 'w+')
-    for charge, distance in results:
-        outputFile.write(str(charge) + ", " + str(distance) + "\n")
+    for charge, distance, force in results:
+        outputFile.write(str(charge) + ", " + str(distance) + ", " + str(force) + "\n")
     outputFile.close()

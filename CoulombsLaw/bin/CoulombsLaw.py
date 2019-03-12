@@ -23,35 +23,31 @@ def atomLoop(Atoms, Ligands):
     k = 9 * math.pow(10, 9) # This is Coulombs constant k in N * m^2/C^2
     results = []
     for atom in Atoms:
-        subset = []
-        forces = []
-        force = 0
-        min = getDistance(atom, Ligands[0])
+        minDist = getDistance(atom, Ligands[0])
         closest = Ligands[0]
         for ligand in Ligands:
             dist = getDistance(atom, ligand)
-            if dist < min:
-                closest = ligand
-                min = dist
-        subset = checkRadius(Atoms, atom)
-        subset.append(atom)
-        for s in subset:
-            force += coulombsLaw(s, closest, min)
-            #forces.append(coulombsLaw(s, closest, min))
-        #force = resultantForce(forces)
-        min = min * math.pow(10, 10)
-        results.append((force, min))
+            if dist < minDist: # Find the Ligand closest to the atom
+                closestLigand = ligand
+                minDist = dist
+        force = coulombsLaw(atom, closestLigand, minDist) # calculate the force
+        minDist = minDist * math.pow(10, 10) # Change the distance back to angstroms
+        results.append((atom.Charge, minDist, force))
     return results
 
 def coulombsLaw(atom, ligand, dist):
     k = 9 * math.pow(10, 9) # This is Coulombs constant k in N * m^2/C^2
-    angle = getVectorAngle(atom, ligand)
-    unitV = getUnitVector(atom, ligand)
-    forceX = ((k * atom.Charge * ligand.Charge) / math.pow(dist, 2)) * unitV[0]
-    forceY = ((k * atom.Charge * ligand.Charge) / math.pow(dist, 2)) * unitV[1]
-    forceZ = ((k * atom.Charge * ligand.Charge) / math.pow(dist, 2)) * unitV[2]
-    force = math.sqrt(math.pow(forceX, 2) + math.pow(forceY, 2) + math.pow(forceZ, 2))
+    force = (k * atom.Charge * ligand.Charge) / math.pow(dist, 2)
+    force = force / (4185 * (6.0221409 * math.pow(10, 23)))
     return force
+
+def getDistance(atom, ligand):
+    dist = math.sqrt(math.pow(ligand.X - atom.X, 2) + math.pow(ligand.Y - atom.Y,2) + math.pow(ligand.Z -atom.Z, 2))
+    dist = dist * math.pow(10, -10)
+    return dist
+
+
+
 
 def getVectorAngle(atom, ligand):
     atomMag    = math.sqrt(math.pow(atom.X, 2)+ math.pow(atom.Y, 2) + math.pow(atom.Z, 2))
@@ -64,21 +60,12 @@ def getUnitVector(atom, ligand):
     x = (ligand.X - atom.X) * math.pow(10, -10)
     y = (ligand.Y - atom.Y) * math.pow(10, -10)
     z = (ligand.Z - atom.Z) * math.pow(10, -10)
-    #return (x, y, z)
 
     vectorMag = getDistance(atom, ligand)
     ax = x/vectorMag
     ay = y/vectorMag
     az = z/vectorMag
     return (ax, ay, az)
-
-#def resultantForce(forces):
-#    for force in forces:
-
-def getDistance(atom, ligand):
-    dist = math.sqrt(math.pow(ligand.X - atom.X, 2) + math.pow(ligand.Y - atom.Y,2) + math.pow(ligand.Z -atom.Z, 2))
-    dist = dist * math.pow(10, -10)
-    return dist
 
 def checkRadius(Atoms, atom):
     subset = []
