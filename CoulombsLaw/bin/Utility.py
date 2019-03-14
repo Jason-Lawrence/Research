@@ -1,10 +1,9 @@
 """
-This file holds utility functions to be used. This entails opening, parsing, and loading files into the program.
-It builds all of the Atoms in the file and provides a list of general atoms and a list of ligands
-At the end of the program it takes the results and writes it to a file.
 This file was written by Jason Lawrence to be used for Professor Minh's Research Group
 """
 import Atom
+
+DEBUG = False # Helps with debugging parsing errors
 
 def init(dir, fileName):
     filePath = dir + "\\" + fileName
@@ -27,6 +26,7 @@ def Constructor(file):
 
 def parser(line):
     parsed = " ".join(line.split())
+    if DEBUG: print(parsed)
     parsedLine = parsed.split(" ")
     if parsedLine[3] == "LIG": # Sets the Radius to be None
         parsedLine.append(0)
@@ -35,8 +35,9 @@ def parser(line):
         parsedLine.insert(4, None)
     except:
         pass # Do nothing as thier is a Chain ID
-    while len(parsedLine) < 11:
+    if len(parsedLine) != 11: # This is incase a  general atom doesn't have a radius.
         parsedLine.append(0)
+    if DEBUG: print(parsedLine)
     return parsedLine
 
 def buildAtom(atomInfo):

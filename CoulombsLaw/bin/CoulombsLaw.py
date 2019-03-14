@@ -7,7 +7,7 @@ import Atom
 import os
 
 def main():
-    InputDir   = "C:\\Users\\Jason\\Desktop\\Projects\\Research\\CoulombsLaw\\Files\\Input" # This is the directory with all of the input files to run
+    InputDir   = "C:\\Users\\Jason\\Desktop\\Projects\\Research\\CoulombsLaw\\Files\\Input" # This is the directory with all of the input files to run. Needs to be set by user.
     OutputDir  = "C:\\Users\\Jason\\Desktop\\Projects\\Research\\CoulombsLaw\\Files\\Output" # This directory is where all of the output files are placed. They are named "Output" + "File Name"
     HoldingDir = "C:\\Users\\Jason\\Desktop\\Projects\\Research\\CoulombsLaw\\Files\\Holding" # This directory is used for placing files that have either already been run or files that don't need to be run.
 
@@ -18,7 +18,6 @@ def main():
         os.rename((InputDir + "\\" + file), (HoldingDir + "\\" + file)) # Moves Input file to the Holding Directory
 
 def atomLoop(Atoms, Ligands):
-    k = 9 * math.pow(10, 9) # This is Coulombs constant k in N * m^2/C^2
     results = [] # list to place the Results in formatted as [(atom.Charge, Distance between atom and closest ligand, Force between atom and the closest ligand),(...)]
     for atom in Atoms:
         minDist = getDistance(atom, Ligands[0]) #just to get initial values
@@ -45,7 +44,7 @@ def getDistance(atom, ligand):
     return dist
 
 
-
+# These functions ended up being unecessary
 
 def getVectorAngle(atom, ligand):
     atomMag    = math.sqrt(math.pow(atom.X, 2)+ math.pow(atom.Y, 2) + math.pow(atom.Z, 2))
