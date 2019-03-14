@@ -35,7 +35,7 @@ This file holds the class that defines the atom object that will be used for the
 
 This file holds utility functions to be used. This entails opening, parsing, and loading files into the program.
 It builds all of the Atoms in the file and provides a list of general atoms and a list of ligands
-At the end of the program it takes the results and writes it to a file. 
+At the end of the program it takes the results and writes it to a file. Note The DEBUG global variable is initially set to False but can be set to true if You want to see how each line gets parsed.
 
 ### init(dir, fileName)
 This function is responsible for opening the Input File passed to it located in the Input Directory. 
