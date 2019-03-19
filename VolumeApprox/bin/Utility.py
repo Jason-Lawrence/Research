@@ -43,9 +43,11 @@ def parser(line):
 def buildAtom(atomInfo):
     return Atom.Atom(atomInfo[0], int(atomInfo[1]), atomInfo[2], atomInfo[3], atomInfo[4],  float(atomInfo[5]), float(atomInfo[6]), float(atomInfo[7]), float(atomInfo[8]), float(atomInfo[9]), float(atomInfo[10]))
 
-def outputGeneration(dir, file, results):
-    filePath = dir + "\\Output" + file
+def outputGeneration(results, filePath):
+    outputDir = "C:\\Users\\Jason\\Desktop\\Projects\\Research\\VolumeApprox\\Files\\Output"
+    fileName = filePath.split("/")
+    filePath = outputDir + "\\Output" + fileName[len(fileName)-1]
     outputFile = open(filePath, 'w+')
-    for charge, distance, force in results:
-        outputFile.write(str(charge) + ", " + str(distance) + ", " + str(force) + "\n")
+    for num, ratio in results:
+        outputFile.write(str(num) + ", " + str(ratio) + "\n")
     outputFile.close()

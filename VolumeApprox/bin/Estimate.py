@@ -8,10 +8,11 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def main():
     Atoms, Ligands = init()
-    combined = Atoms + Ligands
-    rCutOff = sys.argv[2]
-    plot(Atoms, Ligands)
-    ligandLoop(Ligands, Atoms, rCutOff)
+    rCutOff = float(sys.argv[2])
+    #plot(Atoms, Ligands)
+    Ratios = ligandLoop(Ligands, Atoms, rCutOff)
+    Utility.outputGeneration(Ratios, sys.argv[1])
+    #combined = Atoms + Ligands
     #center = findCenter(combined)
     #vol = findVolume(center, rCutOff, combined)
     #print("The volume is approximately: " + str(vol) + " Angstroms cubed")
@@ -33,6 +34,7 @@ def init():
         exit(1)
 
 def ligandLoop(Ligands, Atoms, rCutOff):
+    Ratios = []
     for ligand in Ligands:
         count = 0
         for atom in Atoms:
@@ -40,6 +42,8 @@ def ligandLoop(Ligands, Atoms, rCutOff):
             if dist <= rCutOff:
                 count += 1
         ratio = count / len(Atoms)
+        Ratios.append((ligand.Number, ratio))
+    return Ratios
 
 
 def findVolume(center, rCutOff, combined):
