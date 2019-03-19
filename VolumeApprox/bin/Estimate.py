@@ -11,9 +11,10 @@ def main():
     combined = Atoms + Ligands
     rCutOff = sys.argv[2]
     plot(Atoms, Ligands)
-    center = findCenter(combined)
-    vol = findVolume(center, rCutOff, combined)
-    print("The volume is approximately: " + str(vol) + " Angstroms cubed")
+    ligandLoop(Ligands, Atoms, rCutOff)
+    #center = findCenter(combined)
+    #vol = findVolume(center, rCutOff, combined)
+    #print("The volume is approximately: " + str(vol) + " Angstroms cubed")
     return 1
 def init():
     try:
@@ -31,6 +32,27 @@ def init():
         print("[Error] No PQR file given")
         exit(1)
 
+def ligandLoop(Ligands, Atoms, rCutOff):
+    for ligand in Ligands:
+        count = 0
+        for atom in Atoms:
+            dist = getDistanceFromLigand(ligand, atom)
+            if dist <= rCutOff:
+                count += 1
+        ratio = count / len(Atoms)
+
+
+def findVolume(center, rCutOff, combined):
+    distance = getFarthestPoint(center, combined)
+    return (4/3) * math.pi * math.pow(distance, 3)
+
+def getDistanceFromLigand(ligand, atom):
+        return math.sqrt(math.pow(ligand.X - atom.X, 2) + math.pow(ligand.Y - atom.Y,2) + math.pow(ligand.Z - atom.Z, 2))
+
+
+def getDistanceFromCenter(center, atom):
+    return math.sqrt(math.pow(center[0] - atom.X, 2) + math.pow(center[1] - atom.Y,2) + math.pow(center[2] - atom.Z, 2))
+
 def findCenter(combined):
     sumX, sumY, sumZ = 0, 0, 0
 
@@ -45,10 +67,6 @@ def findCenter(combined):
     print("The coordinates of the center are " + str(centerX) + ", "+ str(centerY) + ", " + str(centerZ))
     return centerX, centerY, centerZ
 
-def findVolume(center, rCutOff, combined):
-    distance = getFarthestPoint(center, combined)
-    return (4/3) * math.pi * math.pow(distance, 3)
-
 def getFarthestPoint(center, combined):
     greatestDist = 0
     for atom in combined:
@@ -58,10 +76,6 @@ def getFarthestPoint(center, combined):
             farthestAtom = atom
 
     return greatestDist
-
-def getDistance(center, atom):
-    return math.sqrt(math.pow(center[0] - atom.X, 2) + math.pow(center[1] - atom.Y,2) + math.pow(center[2] - atom.Z, 2))
-
 
 def plot(Atoms, Ligands):
     fig = plt.figure()
