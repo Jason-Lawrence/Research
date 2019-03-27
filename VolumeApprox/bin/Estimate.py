@@ -9,13 +9,14 @@ from mpl_toolkits.mplot3d import Axes3D
 def main():
     Atoms, Ligands = init()
     rCutOff = float(sys.argv[2])
-    #plot(Atoms, Ligands)
+    plot(Atoms, Ligands)
     Ratios = ligandLoop(Ligands, Atoms, rCutOff)
-    Utility.outputGeneration(Ratios, sys.argv[1])
-    #combined = Atoms + Ligands
-    #center = findCenter(combined)
-    #vol = findVolume(center, rCutOff, combined)
-    #print("The volume is approximately: " + str(vol) + " Angstroms cubed")
+    combined = Atoms + Ligands
+    center = findCenter(combined)
+    vol = findVolume(center, combined)
+    vols = calcIndividualVol(vol, Ratios)
+    Utility.outputGeneration(vols, sys.argv[1])
+    print("The volume is approximately: " + str(vol) + " Angstroms cubed")
     return 1
 def init():
     try:
@@ -45,14 +46,18 @@ def ligandLoop(Ligands, Atoms, rCutOff):
         Ratios.append((ligand.Number, ratio))
     return Ratios
 
-
-def findVolume(center, rCutOff, combined):
-    distance = getFarthestPoint(center, combined)
-    return (4/3) * math.pi * math.pow(distance, 3)
-
 def getDistanceFromLigand(ligand, atom):
         return math.sqrt(math.pow(ligand.X - atom.X, 2) + math.pow(ligand.Y - atom.Y,2) + math.pow(ligand.Z - atom.Z, 2))
 
+def calcIndividualVol(vol, Ratios):
+    vols = []
+    for r in Ratios:
+        vols.append((r[0], r[1] * vol))
+    return vols
+
+def findVolume(center, combined):
+    distance = getFarthestPoint(center, combined)
+    return (4/3) * math.pi * math.pow(distance, 3)
 
 def getDistanceFromCenter(center, atom):
     return math.sqrt(math.pow(center[0] - atom.X, 2) + math.pow(center[1] - atom.Y,2) + math.pow(center[2] - atom.Z, 2))
@@ -74,7 +79,7 @@ def findCenter(combined):
 def getFarthestPoint(center, combined):
     greatestDist = 0
     for atom in combined:
-        distance = getDistance(center, atom)
+        distance = getDistanceFromCenter(center, atom)
         if greatestDist < distance:
             greatestDist = distance
             farthestAtom = atom
