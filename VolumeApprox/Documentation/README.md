@@ -47,15 +47,6 @@ It also checks to see if a Chain ID is present. If one is not given then a None 
 It takes the information stored in the atom Info list passed in, builds, and returns the atom object.
 Please note that all type conversions happen here.
 
-### outputGeneration(dir, file, results)
-This function takes the results obtained from performing the calculations and writes them to the file. The ouput file naming scheme is as followsThe word "Output" is prepended to the file name.
-The format for the output is as follows.
-
-#### Columns
-|Column 1 |Column 2 |
-|:--------|:--------|
-|Ligand Number|ratio of atoms within the cut off vs total atoms|
-
 ## Estimate.py
 
 ### main()
