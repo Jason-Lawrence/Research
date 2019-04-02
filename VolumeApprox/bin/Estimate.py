@@ -43,7 +43,7 @@ def MonteCarlo(Ligands, Vertices, rCutOff):
 
 def generateRandomPoints(Vertices):
     randPnts = []
-    for _ in range(1000):
+    for _ in range(10000):
         xval = random.gauss(Vertices[0][0], Vertices[7][0])
         yval = random.gauss(Vertices[0][1], Vertices[7][1])
         zval = random.gauss(Vertices[0][2], Vertices[7][2])

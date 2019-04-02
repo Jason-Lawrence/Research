@@ -3,7 +3,8 @@
 #### By Jason Lawrence
 
 ## Setup/How to run
-TODO
+In the command line navigate to the directory where Estimate.py is saved and then type the following: Estimate.py [Input File] [rCutOff].
+The output will be the volume of the ligand structure in Angstroms cubed.
 
 ## File Descriptions
 
@@ -73,7 +74,7 @@ Uses the vertices that bound the Ligand and calculates the volume of the box.
 This function is responsible for calling all of the substeps to the monte carlo implementation to estimate the volume of the irregular ligand structure. 
 
 ### generateRandomPoints(Vertices)
-This function generates 1000 random points bounded by the bounding box that encapsulates the Ligand structure.
+This function generates random points bounded by the bounding box that encapsulates the Ligand structure.
 
 ### checkHits(Ligands, randPnts, rCutOff)
 This function counts how many of the points randomly generated are within some rCutOff of any of the ligand points. If they are then that random point is considered to be a hit. 
@@ -89,8 +90,18 @@ The Second graph shows the ligands encapsulated by the bounding box.
 ![Figure_2](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\Figure1.png)
 
 ## Sample Output
-The following is sample output from running the script on the complex.pqr file with an rCutOff of 5.
-![Output-1](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-5.png)
+The following is sample output from running the script on the complex.pqr file with varied rCutOffs and amount of randomly generated points.
 
-The following is sample output from running the script on the complex.pqr file with an rCutOff of 15.
-![Output-2](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-15.png)
+#### Output with generating 1000 random points
+with an rCutOff of 5.
+![Output-1a](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-5.png)
+
+with an rCutOff of 15.
+![Output-2a](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-15.png)
+
+#### Output with generating 10000 random points
+with an rCutOff of 5
+![Output-1b](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-5b.png)
+
+with an rCutOff of 15
+![Output-2b](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-15b.png)
