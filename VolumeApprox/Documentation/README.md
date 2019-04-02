@@ -63,24 +63,34 @@ This function starts the whole program.
 ### init()
 Checks to see if all of the parameters have been inputed. It is also responsible for calling the Utility functions to load and construct the atom objects.
 
-### LigandLoop(Atoms, Ligands)
-This function loops through all of the ligands and looks for all of the atoms that are within some distance less than the cutoff. It counts them and find the ratio of atoms within the distance to the total amount of atoms. 
+### buildLigandStructure(Ligands)
+This function returns a set of vertices for a rectangular prism that bounds the ligand structure
 
-### getDistanceFromLigand(atom, ligand)
-This function calculates the distance between the atom and the ligand by using the distance formula. it converst the distance to meters before it returns the distance.
+### calcVolBox(Vertices)
+Uses the vertices that bound the Ligand and calculates the volume of the box.
 
-### calcIndividualVol(vol, Ratios)
-Uses the total volume of the structure and the ratio of points within some rCutOff of a Ligand atom and calculates the volume.
+### MonteCarlo(Ligands, Vertices, rCutOff)
+This function is responsible for calling all of the substeps to the monte carlo implementation to estimate the volume of the irregular ligand structure. 
 
-### findVolume(center, combined)
-it finds the farthest point from the center and uses that as the radius for calculating the volume of a sphere.
+### generateRandomPoints(Vertices)
+This function generates 1000 random points bounded by the bounding box that encapsulates the Ligand structure.
 
-### Structure
-The following graphs show what the structure looks like the red dots are the non ligand atoms and the blue triangles are the ligands
-![Figure_1](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\Figure_1.png)
+### checkHits(Ligands, randPnts, rCutOff)
+This function counts how many of the points randomly generated are within some rCutOff of any of the ligand points. If they are then that random point is considered to be a hit. 
 
-![Figure_2](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\Figure_2.png)
+### getDistanceFromLigand(Ligand, p)
+Using the distance formula it calculates the distance between a ligand and a randomly generated point.
 
-### Sample Output
-The following is sample output from running the script on the complex.pqr file
-![Output](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\Output.png)
+## Structure
+The following graphs show what the structure looks like. The first graph shows the raw ligands
+![Figure_1](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\Ligands.png)
+
+The Second graph shows the ligands encapsulated by the bounding box.
+![Figure_2](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\Figure1.png)
+
+## Sample Output
+The following is sample output from running the script on the complex.pqr file with an rCutOff of 5.
+![Output-1](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-5.png)
+
+The following is sample output from running the script on the complex.pqr file with an rCutOff of 15.
+![Output-2](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-15.png)

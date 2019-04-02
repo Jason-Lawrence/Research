@@ -2,22 +2,22 @@ import math
 import sys
 import Atom
 import Utility
+import random
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 
 
 def main():
     Atoms, Ligands = init()
     rCutOff = float(sys.argv[2])
-    plot(Atoms, Ligands)
-    Ratios = ligandLoop(Ligands, Atoms, rCutOff)
-    combined = Atoms + Ligands
-    center = findCenter(combined)
-    vol = findVolume(center, combined)
-    vols = calcIndividualVol(vol, Ratios)
-    Utility.outputGeneration(vols, sys.argv[1])
+    #plotLigands(Ligands)
+    Vertices = buildLigandStructure(Ligands)
+    #plotBoundingBox(Ligands, Vertices)
+    vol = MonteCarlo(Ligands, Vertices, rCutOff)
     print("The volume is approximately: " + str(vol) + " Angstroms cubed")
     return 1
+
 def init():
     try:
         if len(sys.argv) != 3:
@@ -34,64 +34,113 @@ def init():
         print("[Error] No PQR file given")
         exit(1)
 
-def ligandLoop(Ligands, Atoms, rCutOff):
-    Ratios = []
-    for ligand in Ligands:
-        count = 0
-        for atom in Atoms:
-            dist = getDistanceFromLigand(ligand, atom)
-            if dist <= rCutOff:
-                count += 1
-        ratio = count / len(Atoms)
-        Ratios.append((ligand.Number, ratio))
-    return Ratios
+def MonteCarlo(Ligands, Vertices, rCutOff):
+    randPnts = generateRandomPoints(Vertices)
+    hits     = checkHits(Ligands, randPnts, rCutOff)
+    volBox   = calcVolBox(Vertices)
+    volLigs  = volBox * (hits / len(randPnts))
+    return volLigs
 
-def getDistanceFromLigand(ligand, atom):
-        return math.sqrt(math.pow(ligand.X - atom.X, 2) + math.pow(ligand.Y - atom.Y,2) + math.pow(ligand.Z - atom.Z, 2))
+def generateRandomPoints(Vertices):
+    randPnts = []
+    for _ in range(1000):
+        xval = random.gauss(Vertices[0][0], Vertices[7][0])
+        yval = random.gauss(Vertices[0][1], Vertices[7][1])
+        zval = random.gauss(Vertices[0][2], Vertices[7][2])
+        randPnts.append((xval, yval, zval))
+    return randPnts
 
-def calcIndividualVol(vol, Ratios):
-    vols = []
-    for r in Ratios:
-        vols.append((r[0], r[1] * vol))
-    return vols
+def checkHits(Ligands, randPnts, rCutOff):
+    hits = 0
+    for point in randPnts:
+        for lig in Ligands:
+            dist = getDistanceFromLigand(lig, point)
+            if dist < rCutOff:
+                hits += 1
+                continue
+    return hits
 
-def findVolume(center, combined):
-    distance = getFarthestPoint(center, combined)
-    return (4/3) * math.pi * math.pow(distance, 3)
+def getDistanceFromLigand(ligand, p):
+    return math.sqrt(math.pow(ligand.X - p[0], 2) + math.pow(ligand.Y - p[1], 2) + math.pow(ligand.Z - p[2], 2))
 
-def getDistanceFromCenter(center, atom):
-    return math.sqrt(math.pow(center[0] - atom.X, 2) + math.pow(center[1] - atom.Y,2) + math.pow(center[2] - atom.Z, 2))
+def calcVolBox(Vertices):
+    width  = getDistBetweenPnts(Vertices[0], Vertices[1])
+    length = getDistBetweenPnts(Vertices[0], Vertices[4])
+    height = getDistBetweenPnts(Vertices[0], Vertices[2])
+    vol = width * length * height
+    return vol
 
-def findCenter(combined):
-    sumX, sumY, sumZ = 0, 0, 0
+def getDistBetweenPnts(p1, p2):
+    return math.sqrt(math.pow(p2[0] - p1[0], 2) + math.pow(p2[1] - p1[1], 2) + math.pow(p2[2] - p1[2], 2))
 
-    for atom in combined:
-        sumX += atom.X
-        sumY += atom.Y
-        sumZ += atom.Z
+def buildLigandStructure(Ligands):
+    LigX, LigY, LigZ = getXYZLists(Ligands)
+    # Get initial values
+    Xmin = LigX[0]
+    Xmax = LigX[0]
+    Ymin = LigY[0]
+    Ymax = LigY[0]
+    Zmin = LigZ[0]
+    Zmax = LigZ[0]
 
-    centerX = sumX / len(combined)
-    centerY = sumY / len(combined)
-    centerZ = sumZ / len(combined)
-    print("The coordinates of the center are " + str(centerX) + ", "+ str(centerY) + ", " + str(centerZ))
-    return centerX, centerY, centerZ
+    for x in range(len(Ligands)):
+        if LigX[x] < Xmin:
+            Xmin = LigX[x]
 
-def getFarthestPoint(center, combined):
-    greatestDist = 0
-    for atom in combined:
-        distance = getDistanceFromCenter(center, atom)
-        if greatestDist < distance:
-            greatestDist = distance
-            farthestAtom = atom
+        elif LigX[x] > Xmax:
+            Xmax = LigX[x]
+    for x in range(len(Ligands)):
+        if LigY[x] < Ymin:
+            Ymin = LigY[x]
 
-    return greatestDist
+        elif LigY[x] > Ymax:
+            Ymax = LigY[x]
+    for x in range(len(Ligands)):
+        if LigZ[x] < Zmin:
+            Zmin = LigZ[x]
 
-def plot(Atoms, Ligands):
+        elif LigZ[x] > Zmax:
+            Zmax = LigZ[x]
+
+    Vertices = []
+    Xs = [Xmin, Xmax]
+    Ys = [Ymin, Ymax]
+    Zs = [Zmin, Zmax]
+
+    for x in Xs:
+        for y in Ys:
+            for z in Zs:
+                 Vertices.append((x, y, z))
+    return Vertices
+
+def plotBoundingBox(Ligands, v):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection = '3d')
-    AtomX, AtomY, AtomZ = getXYZLists(Atoms)
     LigX, LigY, LigZ = getXYZLists(Ligands)
-    ax.scatter(AtomX, AtomY, AtomZ, c='r', marker='o')
+
+    verts = [[v[0], v[2], v[3], v[1]],
+             [v[4], v[5], v[7], v[6]],
+             [v[0], v[4], v[6], v[2]],
+             [v[0], v[1], v[5], v[4]],
+             [v[2], v[3], v[7], v[6]],
+             [v[1], v[3], v[7], v[5]]]
+
+    collection = Poly3DCollection(verts, linewidths=1, edgecolors='r', alpha= 0.4)
+    face_color = [0.75, 0.75, 0.75]
+    collection.set_facecolor(face_color)
+    ax.add_collection3d(collection)
+
+    ax.scatter(LigX, LigY, LigZ, c='b', marker='^')
+
+    ax.set_xlabel("X Label")
+    ax.set_ylabel("Y Label")
+    ax.set_zlabel("Z Label")
+    plt.show()
+
+def plotLigands(Ligands):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection = '3d')
+    LigX, LigY, LigZ = getXYZLists(Ligands)
     ax.scatter(LigX, LigY, LigZ, c='b', marker='^')
     ax.set_xlabel("X Label")
     ax.set_ylabel("Y Label")
