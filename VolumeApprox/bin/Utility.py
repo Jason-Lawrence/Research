@@ -42,12 +42,15 @@ def parser(line):
 
 def buildAtom(atomInfo):
     return Atom.Atom(atomInfo[0], int(atomInfo[1]), atomInfo[2], atomInfo[3], atomInfo[4],  float(atomInfo[5]), float(atomInfo[6]), float(atomInfo[7]), float(atomInfo[8]), float(atomInfo[9]), float(atomInfo[10]))
-
-def outputGeneration(results, filePath):
+"""
+def outputGeneration(results):
     outputDir = "C:\\Users\\Jason\\Desktop\\Projects\\Research\\VolumeApprox\\Files\\Output"
     fileName = filePath.split("/")
-    filePath = outputDir + "\\Output" + fileName[len(fileName)-1]
+    filePath = outputDir + "\\Outputcomplex.txt"
     outputFile = open(filePath, 'w+')
-    for num, ratio in results:
-        outputFile.write(str(num) + ", " + str(ratio) + "\n")
+    for key in results:
+        outputFile.write("Number of random points generated: " + str(key) + " ")
+        for res in results[key]:
+            outputFile.write(str(num) + ", " + str(ratio) + "\n")
     outputFile.close()
+"""

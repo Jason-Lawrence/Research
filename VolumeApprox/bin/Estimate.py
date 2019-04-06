@@ -11,11 +11,13 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 def main():
     Atoms, Ligands = init()
     rCutOff = float(sys.argv[2])
+    #num     = int(sys.argv[3])
     #plotLigands(Ligands)
-    Vertices = buildLigandStructure(Ligands)
+    Vertices = buildLigandStructure(Ligands, rCutOff)
     #plotBoundingBox(Ligands, Vertices)
-    vol = MonteCarlo(Ligands, Vertices, rCutOff)
-    print("The volume is approximately: " + str(vol) + " Angstroms cubed")
+    #testNumRandomPoints(Ligands, Vertices)
+    testrCutOffGrowth(Ligands, Vertices)
+    #print("The volume is approximately: " + str(vol) + " Angstroms cubed")
     return 1
 
 def init():
@@ -34,31 +36,102 @@ def init():
         print("[Error] No PQR file given")
         exit(1)
 
-def MonteCarlo(Ligands, Vertices, rCutOff):
-    randPnts = generateRandomPoints(Vertices)
+def testNumRandomPoints(Ligands, Vertices):
+    rCutOff = 5
+    nums = [10000, 50000, 100000, 500000, 1000000, 1500000, 2000000]
+    results = {}
+    countout = 0
+    for num in nums:
+        countin = 0
+        sum = 0
+        for _ in range(10):
+            countin += 1
+            vol = MonteCarlo(Ligands, Vertices, rCutOff, num)
+            sum += vol
+            if num not in results:
+                results[num] = [vol]
+            else:
+                results[num].append(vol)
+            print("Count: " + str(countin))
+        avg = sum / countin
+        results[num].append(avg)
+        print("For " + str(num) + " points randomly generated")
+        print("Results: " + str(results[num]))
+        print("The Avg. is " + str(avg))
+    analyzeResults(results)
+    return 1
+
+def analyzeResults(results):
+    # Calculate the standard deviation for each key
+    fig = plt.figure()
+    for key in results:
+        sum = 0
+        mean = results[key].pop(len(results[key])-1)
+        for res in results[key]:
+            sum += (math.pow(res - mean, 2))
+        stdDev = math.sqrt(sum / len(results[key]))
+        Min = min(results[key])
+        Max = max(results[key])
+        x = [key, key, key]
+        y = [Min, Max, mean]
+        plt.scatter(x, y)
+    plt.show()
+
+def testrCutOffGrowth(Ligands, Vertices):
+    num = 1000000
+    rCutOff = 5
+    results = {}
+    for _ in range(10):
+        sum = 0
+        for _ in range(5):
+            vol = MonteCarlo(Ligands, Vertices, rCutOff, num)
+            sum += vol
+        avg = sum / 5
+        results[rCutOff] = avg
+        print("rCutOff: " + str(rCutOff) + " , Volume: " + str(results[rCutOff]))
+        rCutOff += 1
+    analyzerCutOff(results)
+
+def analyzerCutOff(results):
+    fig = plt.figure()
+    x = []
+    y = []
+    for key in results:
+        x.append(key)
+        y.append(results[key])
+    plt.scatter(x, y)
+    plt.xlabel("rCutOff")
+    plt.ylabel("Volume")
+    plt.show()
+
+def MonteCarlo(Ligands, Vertices, rCutOff, num):
+    randPnts = generateRandomPoints(Vertices, num)
     hits     = checkHits(Ligands, randPnts, rCutOff)
     volBox   = calcVolBox(Vertices)
-    volLigs  = volBox * (hits / len(randPnts))
+    volLigs  = volBox * (float(hits) / len(randPnts))
     return volLigs
 
-def generateRandomPoints(Vertices):
+def generateRandomPoints(Vertices, num):
     randPnts = []
-    for _ in range(10000):
-        xval = random.gauss(Vertices[0][0], Vertices[7][0])
-        yval = random.gauss(Vertices[0][1], Vertices[7][1])
-        zval = random.gauss(Vertices[0][2], Vertices[7][2])
+    for _ in range(num):
+        xval = random.uniform(Vertices[0][0], Vertices[7][0])
+        yval = random.uniform(Vertices[0][1], Vertices[7][1])
+        zval = random.uniform(Vertices[0][2], Vertices[7][2])
         randPnts.append((xval, yval, zval))
     return randPnts
 
 def checkHits(Ligands, randPnts, rCutOff):
     hits = 0
     for point in randPnts:
-        for lig in Ligands:
-            dist = getDistanceFromLigand(lig, point)
-            if dist < rCutOff:
-                hits += 1
-                continue
+        hits += checkPoint(Ligands, point, rCutOff)
     return hits
+
+def checkPoint(Ligands, point, rCutOff):
+    for lig in Ligands:
+        dist = getDistanceFromLigand(lig, point)
+        if dist <= rCutOff:
+            return 1
+    return 0
 
 def getDistanceFromLigand(ligand, p):
     return math.sqrt(math.pow(ligand.X - p[0], 2) + math.pow(ligand.Y - p[1], 2) + math.pow(ligand.Z - p[2], 2))
@@ -73,34 +146,34 @@ def calcVolBox(Vertices):
 def getDistBetweenPnts(p1, p2):
     return math.sqrt(math.pow(p2[0] - p1[0], 2) + math.pow(p2[1] - p1[1], 2) + math.pow(p2[2] - p1[2], 2))
 
-def buildLigandStructure(Ligands):
+def buildLigandStructure(Ligands, rCutOff):
     LigX, LigY, LigZ = getXYZLists(Ligands)
     # Get initial values
-    Xmin = LigX[0]
-    Xmax = LigX[0]
-    Ymin = LigY[0]
-    Ymax = LigY[0]
-    Zmin = LigZ[0]
-    Zmax = LigZ[0]
+    Xmin = LigX[0] - rCutOff
+    Xmax = LigX[0] + rCutOff
+    Ymin = LigY[0] - rCutOff
+    Ymax = LigY[0] + rCutOff
+    Zmin = LigZ[0] - rCutOff
+    Zmax = LigZ[0] + rCutOff
 
     for x in range(len(Ligands)):
-        if LigX[x] < Xmin:
-            Xmin = LigX[x]
+        if LigX[x] - rCutOff < Xmin:
+            Xmin = LigX[x] - rCutOff
 
-        elif LigX[x] > Xmax:
-            Xmax = LigX[x]
+        elif LigX[x] + rCutOff > Xmax:
+            Xmax = LigX[x] + rCutOff
     for x in range(len(Ligands)):
-        if LigY[x] < Ymin:
-            Ymin = LigY[x]
+        if LigY[x] - rCutOff < Ymin:
+            Ymin = LigY[x] - rCutOff
 
-        elif LigY[x] > Ymax:
-            Ymax = LigY[x]
+        elif LigY[x] + rCutOff > Ymax:
+            Ymax = LigY[x] + rCutOff
     for x in range(len(Ligands)):
-        if LigZ[x] < Zmin:
-            Zmin = LigZ[x]
+        if LigZ[x] - rCutOff < Zmin:
+            Zmin = LigZ[x] - rCutOff
 
-        elif LigZ[x] > Zmax:
-            Zmax = LigZ[x]
+        elif LigZ[x] + rCutOff > Zmax:
+            Zmax = LigZ[x] + rCutOff
 
     Vertices = []
     Xs = [Xmin, Xmax]
