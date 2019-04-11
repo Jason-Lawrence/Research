@@ -10,19 +10,20 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 
 def main():
     Atoms, Ligands = init()
-    rCutOff = float(sys.argv[2])
-    #num     = int(sys.argv[3])
+    rCutOff  = float(sys.argv[2])
+    num      = int(sys.argv[3])
     #plotLigands(Ligands)
     Vertices = buildLigandStructure(Ligands, rCutOff)
+    vol      = MonteCarlo(Ligands, Vertices, rCutOff, num)
     #plotBoundingBox(Ligands, Vertices)
-    #testNumRandomPoints(Ligands, Vertices)
-    testrCutOffGrowth(Ligands, Vertices)
-    #print("The volume is approximately: " + str(vol) + " Angstroms cubed")
+    testNumRandomPoints(Ligands, Vertices)
+    #testrCutOffGrowth(Ligands, Vertices)
+    print("The volume is approximately: " + str(vol) + " Angstroms cubed")
     return 1
 
 def init():
     try:
-        if len(sys.argv) != 3:
+        if len(sys.argv) != 4: #Checks to see if the correct amount of arguments have been passed in
             print("[Error] Not enough Arguments")
             exit(1)
         else:
@@ -38,9 +39,9 @@ def init():
 
 def testNumRandomPoints(Ligands, Vertices):
     rCutOff = 5
+    #nums = [1000, 10000, 100000, 1000000, 10000000]
     nums = [10000, 50000, 100000, 500000, 1000000, 1500000, 2000000]
     results = {}
-    countout = 0
     for num in nums:
         countin = 0
         sum = 0
@@ -70,12 +71,15 @@ def analyzeResults(results):
         for res in results[key]:
             sum += (math.pow(res - mean, 2))
         stdDev = math.sqrt(sum / len(results[key]))
-        Min = min(results[key])
-        Max = max(results[key])
-        x = [key, key, key]
-        y = [Min, Max, mean]
+        Min = min(results[key]) #finds the minimum value
+        Max = max(results[key]) #finds the maximum value
+        #x = [key, key, key]
+        #y = [Min, Max, mean]
+        x = [key]
+        y = [stdDev]
         plt.scatter(x, y)
     plt.show()
+
 
 def testrCutOffGrowth(Ligands, Vertices):
     num = 1000000

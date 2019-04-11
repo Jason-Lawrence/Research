@@ -3,7 +3,7 @@
 #### By Jason Lawrence
 
 ## Setup/How to run
-In the command line navigate to the directory where Estimate.py is saved and then type the following: Estimate.py [Input File] [rCutOff].
+In the command line navigate to the directory where Estimate.py is saved and then type the following: Estimate.py [Input File] [rCutOff] [randomPoints].
 The output will be the volume of the ligand structure in Angstroms cubed.
 
 ## File Descriptions
@@ -83,16 +83,38 @@ The Second graph shows the ligands encapsulated by the bounding box.
 ## Sample Output
 The following is sample output from running the script on the complex.pqr file with varied rCutOffs and amount of randomly generated points.
 
-#### Output with generating 1000 random points
+#### Output with generating 10000 random points
 with an rCutOff of 5.
 ![Output-1a](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-5.png)
 
 with an rCutOff of 15.
 ![Output-2a](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-15.png)
 
-#### Output with generating 10000 random points
+#### Output with generating 100000 random points
 with an rCutOff of 5
 ![Output-1b](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-5b.png)
 
 with an rCutOff of 15
 ![Output-2b](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOff-15b.png)
+
+## Amount of Random Points Generated Test
+The purpose of this test was to determine how the absolute error changes as the amount of random points generated increases. 
+For each amount of Random Points I ran the approximation ten times. I then found the maximum value, minimum value and the average of each round. 
+The following graphs show the maximum, minimum and average for each round. As the amount of points increase the absolute error decreases. 
+
+![100,000 - 2,000,000](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\randomNumGen2.png)
+
+The Standard deviation for each round are plotted below.
+![100,000 - 2,000,000](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\StdDev.png)
+
+![1000 - 10,000,000](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\randomNumGen1.png)
+
+## rCutOffTest
+The purpose of this test was to determine if the rate that the volume changes as rCutOff increases is less then Angstroms cubed rate.
+For this test I kept the amount of points generated at an even 1 million then for every cut off, starting at 5 and increasing by 1 until the cut off reached 14, I ran the approximation 5 times then took the average and plotted it. 
+
+![RcutTest](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOffTest.png)
+
+
+
+
