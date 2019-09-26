@@ -99,8 +99,8 @@ with an rCutOff of 15
 
 ## Amount of Random Points Generated Test
 The purpose of this test was to determine how the absolute error changes as the amount of random points generated increases. 
-For each amount of Random Points I ran the approximation ten times. I then found the maximum value, minimum value and the average of each round. 
-The following graphs show the maximum, minimum and average for each round. As the amount of points increase the absolute error decreases. 
+For each amount of Random Points I ran the approximation ten times. I then found the average of each round and subtracted/added the standard deviation to it. 
+The following graphs show the average, avg-stdDev, and avg+stdDev for each round. As the amount of points increase the standard deviation decreases. 
 
 ![100,000 - 2,000,000](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\randomNumGen2.png)
 
@@ -113,8 +113,11 @@ The Standard deviation for each round are plotted below.
 The purpose of this test was to determine if the rate that the volume changes as rCutOff increases is less then Angstroms cubed rate.
 For this test I kept the amount of points generated at an even 1 million then for every cut off, starting at 5 and increasing by 1 until the cut off reached 14, I ran the approximation 5 times then took the average and plotted it. 
 
-![RcutTest](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOffTest.png)
+![RcutTestGraph1](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutOffTest.png)
 
 
+![RcutTestGraph2](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutCubed.png)
 
+
+![RcutTestNums](C:\Users\Jason\Desktop\Projects\Research\VolumeApprox\Documentation\rCutTestNums.png)
 

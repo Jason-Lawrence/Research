@@ -16,7 +16,7 @@ def main():
     Vertices = buildLigandStructure(Ligands, rCutOff)
     vol      = MonteCarlo(Ligands, Vertices, rCutOff, num)
     #plotBoundingBox(Ligands, Vertices)
-    testNumRandomPoints(Ligands, Vertices)
+    #testNumRandomPoints(Ligands, Vertices)
     #testrCutOffGrowth(Ligands)
     #print("The volume is approximately: " + str(vol) + " Angstroms cubed")
     return 1
@@ -240,5 +240,3 @@ def getXYZLists(list):
         y.append(element.Y)
         z.append(element.Z)
     return x, y, z
-
-main()
